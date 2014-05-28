@@ -1,1 +1,1 @@
-module.exports.CompositionManager = require('./CompositionBlock').CompositionManager;
+module.exports.CompositionManager = require('./CompositionManager').CompositionManager;
