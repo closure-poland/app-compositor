@@ -1,0 +1,29 @@
+{
+  "name": "app-compositor",
+  "version": "0.1.0",
+  "description": "A dependency-based code runner for Application Composition Layers.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/closure-poland/app-compositor.git"
+  },
+  "keywords": [
+    "composition",
+    "application",
+    "promise",
+    "constructor",
+    "initialization",
+    "init"
+  ],
+  "author": "Robert Kawecki <robert@geo-com.pl>",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/closure-poland/app-compositor/issues"
+  }
+}
