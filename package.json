@@ -1,13 +1,19 @@
 {
   "name": "app-compositor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A dependency-based code runner for Application Composition Layers.",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
+  "dependencies": {
+	"when": "3.2.x"
+  },
+  "devDependencies": {
+	"mocha": "1.x.x"
+  },
   "scripts": {
-    "test": "mocha test"
+    "test": "node_modules/mocha/bin/_mocha test"
   },
   "repository": {
     "type": "git",

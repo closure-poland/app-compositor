@@ -21,15 +21,16 @@ CompositionManager.prototype.runModules = function runModules(moduleFunctions){
 	});
 	// Now, we have all the declarations we need and we can proceed to run the module:
 	var blockRunPromises = [];
-	try{
-		blocks.forEach(function _runModuleFromBlock(block){
-			blockRunPromises.push(block.run());
-		});
-	}
-	catch(runningError){
-		return when.reject(runningError);
-	}
-	return when.all(blockRunPromises);
+	blocks.forEach(function _runModuleFromBlock(block){
+		blockRunPromises.push(block.run().then(undefined, function(reason){
+			return when.reject(reason);
+		}));
+	});
+	// Resolve when all of the composition blocks have been run and all resources provided. We could skip the resources' promises,
+	//  since they are redundant regarding blockRunPromises, but we listen to them anyway to help calm when.js.
+	return when.all(blockRunPromises.concat(Object.keys(this._resourcePromises).map(function mapResourcePromise(resourceName){
+		return self.getResourcePromise(resourceName);
+	})));
 };
 
 module.exports.CompositionManager = CompositionManager;

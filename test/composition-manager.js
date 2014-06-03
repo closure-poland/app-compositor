@@ -46,5 +46,19 @@ describe('CompositionManager', function(){
 				done();
 			});
 		});
+		it('should break off execution and report an error if a module fails to load', function(done){
+			function failingModule(){
+				this.is('failingModule');
+				this.provides('failingModule', function(resources){
+					throw new Error('Failed to load! No particular reason, too, just feeling like it.');
+				});
+			}
+			var manager = new CompositionManager();
+			manager.runModules([failingModule]).done(function errorsMissed(){
+				done(new Error('Promise resolved despite errors!'));
+			}, function errorsProperlyDetected(){
+				done();
+			});
+		});
 	});
 });
