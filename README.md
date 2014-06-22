@@ -40,6 +40,7 @@ db.movies.insert({title: 'Pulp Function', slogan: 'You won\'t know the FUN til y
 
 ## After refactoring ##
 Now, we set out to refactor the application's main file into pretty, extensible code. We are going to do several things:
+
 1. Split the DB server connection and the HTTP server socket creation into separate functions
 2. Make it so that their respective functions return the constructed resources via promises instead of callbacks where necessary
 3. Define a dependency of the HTTP server upon a functioning MongoDB connection (in a real application, the HTTP server would probably be a framework such as Express and various middlewares/routes would be attached separately).
