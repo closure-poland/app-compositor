@@ -46,6 +46,19 @@ describe('CompositionManager', function(){
 				done();
 			});
 		});
+		it('should detect missing resources and bail out', function(done){
+			function missingDependenciesModule(){
+				this.is('missingDependenciesModule');
+				this.requires('nonexistentModule');
+				this.provides('missingDependenciesModule', function(){});
+			}
+			var manager = new CompositionManager();
+			manager.runModules([missingDependenciesModule]).done(function missingDependencyIgnored(){
+				done(new Error('A missing required dependency has been ignored. Aborting!'));
+			}, function missingDependencyNoticed(){
+				done();
+			});
+		});
 		it('should break off execution and report an error if a module fails to load', function(done){
 			function failingModule(){
 				this.is('failingModule');
