@@ -7,7 +7,7 @@
     "test": "test"
   },
   "dependencies": {
-	"when": "3.2.x"
+	"when": "3.4.x"
   },
   "devDependencies": {
 	"mocha": "1.x.x"

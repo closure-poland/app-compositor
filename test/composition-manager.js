@@ -46,6 +46,29 @@ describe('CompositionManager', function(){
 				done();
 			});
 		});
+		it('should fulfill the composition promise with the resources\' values under their respective keys', function(done){
+			function module1(){
+				this.is('module1');
+				this.provides('module1', function(resources){
+					return when.resolve({ identity: 'first' });
+				});
+			}
+
+			function module2(){
+				this.is('module2');
+				this.requires('module1');
+				this.provides('module2', function(resources){
+					return when.resolve({ identity: 'second' });
+				});
+			}
+			var manager = new CompositionManager();
+			manager.runModules([module1, module2]).done(function(composedResources){
+				var module1OK = (composedResources.module1.identity === 'first');
+				var module2OK = (composedResources.module2.identity === 'second');
+				var allOK = module1OK && module2OK;
+				done(allOK ? undefined : new Error('Resource promises fulfilled incorrectly!'));
+			});
+		});
 		it('should detect missing resources and bail out', function(done){
 			function missingDependenciesModule(){
 				this.is('missingDependenciesModule');

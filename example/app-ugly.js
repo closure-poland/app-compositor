@@ -1,6 +1,6 @@
 var mongodb = require('mongodb');
 var http = require('http');
-mongodb.MongoClient.connect('mongodb://127.0.0.1:49153/test', function initializeServer(error, database){
+mongodb.MongoClient.connect('mongodb://127.0.0.1:27017/test', function initializeServer(error, database){
     if(error){
         console.error(error);
         return;

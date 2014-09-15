@@ -1,5 +1,6 @@
 var CompositionBlock = require('./CompositionBlock').CompositionBlock;
 var when = require('when');
+var whenKeys = require('when/keys');
 
 function CompositionManager(){
 	this._resourcePromises = {};
@@ -30,11 +31,8 @@ CompositionManager.prototype.runModules = function runModules(moduleFunctions){
 				return when.reject(reason);
 			}));
 		});
-		// Resolve when all of the composition blocks have been run and all resources provided. We could skip the resources' promises,
-		//  since they are redundant regarding blockRunPromises, but we listen to them anyway to help calm when.js.
-		return when.all(blockRunPromises.concat(Object.keys(this._resourcePromises).map(function mapResourcePromise(resourceName){
-			return self.getResourcePromise(resourceName);
-		})));
+		// Resolve when all resources' promises have been resolved.
+		return whenKeys.all(self._resourcePromises);
 	}
 	catch(preProcessingError){
 		return when.reject(preProcessingError);

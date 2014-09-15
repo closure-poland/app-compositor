@@ -9,7 +9,7 @@ function database(){
 		var mongodb = require('mongodb');
 		// The "provider" function should return a promise if it operates asynchronously. This promise will later be resolved with a working DB connection.
 		return when.promise(function connectToDB(resolve, reject){
-			mongodb.MongoClient.connect('mongodb://127.0.0.1:49153/test', function connected(error, database){
+			mongodb.MongoClient.connect('mongodb://127.0.0.1:27017/test', function connected(error, database){
 				if(error){
 					reject(error);
 					return;
@@ -48,6 +48,7 @@ function web(){
 
 manager.runModules([database, web]).done(function applicationCompositionFinished(results){
 	console.log('Composition finished! The application is now running.');
+	console.log(results);
 }, function handleCompositionError(error){
 	console.error('Composition error:', error);
 });
