@@ -1,16 +1,16 @@
 {
   "name": "app-compositor",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A dependency-based code runner for Application Composition Layers.",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-	"when": "3.4.x"
+    "when": "3.4.x"
   },
   "devDependencies": {
-	"mocha": "1.x.x"
+    "mocha": "1.x.x"
   },
   "scripts": {
     "test": "node_modules/mocha/bin/_mocha test"
