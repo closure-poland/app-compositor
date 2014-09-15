@@ -1,5 +1,6 @@
 var CompositionManager = require('../CompositionManager').CompositionManager;
 var when = require('when');
+var assert = require('assert');
 
 describe('CompositionManager', function(){
 	describe('#runModules', function(){
@@ -14,8 +15,8 @@ describe('CompositionManager', function(){
 			function module2(){
 				this.is('module2');
 				this.requires('bus');
-				this.provides('server', function(resources){
-					if(resources.bus.publish() === 'published'){
+				this.provides('server', function(getResource){
+					if(getResource('bus').publish() === 'published'){
 						done();
 					}
 					else{
@@ -24,32 +25,12 @@ describe('CompositionManager', function(){
 				});
 			}
 			var manager = new CompositionManager();
-			manager.runModules([module2, module1]);
-		});
-		it('should signal finishing the composition by resolving the returned promise', function(done){
-			function module1(){
-				this.is('module1');
-				this.provides('module1', function(resources){
-					return when.resolve();
-				});
-			}
-
-			function module2(){
-				this.is('module2');
-				this.requires('module1');
-				this.provides('module2', function(resources){
-					return when.resolve();
-				});
-			}
-			var manager = new CompositionManager();
-			manager.runModules([module1, module2]).done(function(){
-				done();
-			});
+			manager.runModules([module2, module1]).catch(done);
 		});
 		it('should fulfill the composition promise with the resources\' values under their respective keys', function(done){
 			function module1(){
 				this.is('module1');
-				this.provides('module1', function(resources){
+				this.provides('module1', function(){
 					return when.resolve({ identity: 'first' });
 				});
 			}
@@ -57,7 +38,7 @@ describe('CompositionManager', function(){
 			function module2(){
 				this.is('module2');
 				this.requires('module1');
-				this.provides('module2', function(resources){
+				this.provides('module2', function(){
 					return when.resolve({ identity: 'second' });
 				});
 			}
@@ -81,6 +62,20 @@ describe('CompositionManager', function(){
 			}, function missingDependencyNoticed(){
 				done();
 			});
+		});
+		it('should deny access to undeclared dependencies', function(){
+			function misguidedModule(){
+				this.is('misguidedModule');
+				this.provides('misguidedModule', function(getResource){
+					return {
+						someProperty: getResource('someResource')
+					};
+				});
+			}
+			var manager = new CompositionManager();
+			return manager.runModules([ misguidedModule ]).then(function bailOut(){
+				throw new Error('The undeclared dependency access went unnoticed - we should have got an error instead!');
+			}, function allOK(){});
 		});
 		it('should break off execution and report an error if a module fails to load', function(done){
 			function failingModule(){

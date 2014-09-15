@@ -1,53 +1,46 @@
 var when = require('when');
 var parallel = require('when/parallel');
 
-function CompositionBlock(resourceManager){
-	this._resourceManager = resourceManager;
-	this._requiredResourceNames = [];
-	this._providers = [];
-	this._name = undefined;
+function CompositionBlock(setupFunction){
+	var self = this;
+	self.name = null;
+	self.dependencies = [];
+	self.providedName = null;
+	self.providerFunction = null;
+	var moduleContext = {
+		is: function is(name){
+			self.name = name;
+		},
+		requires: function requires(dependencyName){
+			self.dependencies.push(dependencyName);
+		},
+		provides: function provides(dependencyName, providerFunction){
+			self.providedName = dependencyName;
+			self.providerFunction = providerFunction;
+		}
+	};
+	setupFunction.call(moduleContext);
 }
 
-CompositionBlock.prototype.is = function is(name){
-	this._name = name;
+CompositionBlock.prototype.getProvidedName = function getProvidedName(){
+	return this.providedName;
 };
 
-CompositionBlock.prototype.requires = function requires(resourceName){
-	this._requiredResourceNames.push(resourceName);
+CompositionBlock.prototype.getDependencies = function getDependencies(){
+	return this.dependencies.slice();
 };
 
-CompositionBlock.prototype.provides = function provides(resourceName, providerFunction){
-	var self = this;
-	// Note: below, we rely on the semantics of when.promise - namely, that it runs the resolver function (here, _installResolver) synchronously.
-	this._resourceManager.registerResourcePromise(resourceName, when.promise(function _installResolver(resolveProvision, rejectProvision){
-		self._providers.push(function provide(availableResourceMap){
-			return when.try(providerFunction, availableResourceMap).then(function _resolveResourceProvision(providedResource){
-				resolveProvision(providedResource);
-			}, function _rejectResourceProvision(reason){
-				rejectProvision(reason);
-				return when.reject(reason);
-			});
-		});
-	}));
-};
-
-CompositionBlock.prototype.run = function run(){
-	var self = this;
-	var requiredPromises = this._requiredResourceNames.map(function _getResourcePromise(resourceName){
-		return self._resourceManager.getResourcePromise(resourceName);
-	});
-	return when.all(requiredPromises).then(function _runCompositionBlock(requiredResources){
-		// Map the resources back to their original names:
-		var resourceMap = {};
-		for(var i = 0; i < requiredResources.length; ++i){
-			resourceMap[self._requiredResourceNames[i]] = requiredResources[i];
+CompositionBlock.prototype.run = function run(dependencies){
+	function getDependency(name){
+		if(Object.hasOwnProperty.call(dependencies, name)){
+			return dependencies[name];
 		}
-		// Now that all the resources are available and mapped, run the providers!
-		return when.all(self._providers.map(function(providerFunction){
-			return providerFunction(resourceMap);
-		}));
-	});
+		else{
+			throw new Error('Failed to get dependency "' + name + '" - use this.requires(\'' + name + '\') to declare it first.');
+		}
+	}
+	
+	return when.try(this.providerFunction, getDependency);
 };
 
 module.exports.CompositionBlock = CompositionBlock;
-
