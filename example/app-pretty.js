@@ -3,7 +3,6 @@ var manager = new compositor.CompositionManager();
 
 function database(){
 	var when = require('when');
-	this.is('database');
 	this.provides('database', function(dependencies){
 		// The "dependencies" object will be empty here, as we declared none.
 		var mongodb = require('mongodb');
@@ -22,11 +21,10 @@ function database(){
 
 function web(){
 	var when = require('when');
-	this.is('web');
 	this.requires('database');
-	this.provides('web', function(dependencies){
+	this.provides('web', function(dependency){
 		var http = require('http');
-		var movieCollection = dependencies.database.collection('movies');
+		var movieCollection = dependency('database').collection('movies');
 		var server = http.createServer(function serveCollectionView(request, response){
 			movieCollection.find().toArray(function printMovies(error, entries){
 				if(error){
