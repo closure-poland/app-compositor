@@ -1,6 +1,6 @@
 {
   "name": "app-compositor",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A dependency-based code runner for Application Composition Layers.",
   "main": "index.js",
   "directories": {
