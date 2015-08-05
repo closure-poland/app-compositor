@@ -1,8 +1,6 @@
 var when = require('when');
 var parallel = require('when/parallel');
 
-var constants = require('./constants');
-
 function CompositionBlock(setupFunction){
 	var self = this;
 	self.name = null;
